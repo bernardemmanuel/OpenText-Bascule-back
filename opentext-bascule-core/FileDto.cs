@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace OpenText_Bascule_Core
+﻿namespace OpenText_Bascule_Core
 {
     public class FileDto
     {
@@ -12,7 +6,8 @@ namespace OpenText_Bascule_Core
         public string Name { get; set; } = String.Empty;
         public string LastWriteTime { get; set; } = String.Empty;
         public long Length { get; set; } = 0;
-
+        public string FullPath { get; set; } = String.Empty;
+        public string? PartialPath { get; set; } = String.Empty;
 
     }
 }

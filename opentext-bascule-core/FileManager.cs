@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.IO;
+using System.Text.RegularExpressions;
 
 namespace OpenText_Bascule_Core
 {
@@ -52,6 +53,8 @@ namespace OpenText_Bascule_Core
 
         public List<FileDto> GetFiles(string path)
         {
+            return GetFilesRecursivelyFromPattern(path, "*.cs", ".*net6.0.*");
+            /*
             CheckDirectoryPath(path);
 
             var result = new List<FileDto>();
@@ -71,10 +74,11 @@ namespace OpenText_Bascule_Core
             });
 
             return result;
+            */
         }
 
 
-        public List<FileDto> GetFilesRecursivelyFromPattern(string path, string filePattern, string pathPattern)
+        private List<FileDto> GetFilesRecursivelyFromPattern(string path, string filePattern, string pathPattern)
         {
             CheckDirectoryPath(path);
 
@@ -96,15 +100,12 @@ namespace OpenText_Bascule_Core
                     Id = result.Count,
                     Name = fi.Name,
                     LastWriteTime = fi.LastWriteTime.ToString("MM/dd/yyyy HH:mm:ss"),
-                    Length = fi.Length
+                    Length = fi.Length,
+                    FullPath = fi.FullName,
+                    PartialPath = fi.DirectoryName?.Replace(path, "")
                 });
 
             });
-
-            /*
-                Console.WriteLine($"{fi.DirectoryName}");
-                Console.WriteLine($"{fi.DirectoryName?.Replace(path, "")}");
-            */
 
             return result;
         }
