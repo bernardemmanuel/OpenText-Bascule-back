@@ -2,8 +2,7 @@
 {
     public interface IFileManager
     {
-        List<FileDto> GetFiles(string path);
-        void CopyFile(string sourceDirName, string targetDirName, string fileName);
+        List<FileDto> GetFiles(string path, string date, string filePattern);
         void CopyFiles(List<string> files, string targetDirName);
     }
 }

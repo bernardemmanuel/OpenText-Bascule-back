@@ -1,6 +1,4 @@
-﻿using System.IO;
-using System.Text.RegularExpressions;
-
+﻿
 namespace OpenText_Bascule_Core
 {
     public class FileManager : IFileManager
@@ -14,23 +12,6 @@ namespace OpenText_Bascule_Core
                 throw new Exception($"Path '{path}' does not exist.");
         }
 
-        public void CopyFile(string sourceDirName, string targetDirName, string fileName)
-        {
-            CheckDirectoryPath(sourceDirName);
-            CheckDirectoryPath(targetDirName);
-
-            if (string.IsNullOrEmpty(fileName))
-                throw new Exception($"FileName is not valid.");
-
-            var sourceFileName = Path.Combine(sourceDirName, fileName);
-
-            if (!File.Exists(sourceFileName))
-                throw new Exception($"File '{sourceFileName}' does not exist.");
-
-            var targetFileName = Path.Combine(targetDirName, fileName);
-
-            File.Copy(sourceFileName, targetFileName, true);
-        }
 
         public void CopyFiles(List<string> files, string targetDirName)
         {
@@ -50,64 +31,33 @@ namespace OpenText_Bascule_Core
         }
 
 
-
-        public List<FileDto> GetFiles(string path)
+        public List<FileDto> GetFiles(string path, string date, string filePattern)
         {
-            return GetFilesRecursivelyFromPattern(path, "*.cs", ".*net6.0.*");
-            /*
-            CheckDirectoryPath(path);
-
+            string pathPattern = $"*{date}*";
+  
             var result = new List<FileDto>();
 
-            DirectoryInfo di = new(path);
-            var files = di.GetFiles().ToList();
-
-            files.ForEach(f =>
+            DirectoryInfo di = new DirectoryInfo(path);
+            DirectoryInfo[] dirs = di.GetDirectories(pathPattern, SearchOption.AllDirectories);
+            foreach (DirectoryInfo folder in dirs)
             {
-                result.Add(new FileDto()
+                foreach (FileInfo file in folder.GetFiles(filePattern))
                 {
-                    Id = result.Count,
-                    Name = f.Name,
-                    LastWriteTime = f.LastWriteTime.ToString("MM/dd/yyyy HH:mm:ss"),
-                    Length = f.Length
-                });
-            });
+                    result.Add(new FileDto()
+                    {
+                        Id = result.Count,
+                        Name = file.Name,
+                        LastWriteTime = file.LastWriteTime.ToString("MM/dd/yyyy HH:mm:ss"),
+                        Length = file.Length,
+                        FullPath = file.FullName,
+                        PartialPath = file.DirectoryName?.Replace(path, "")
+                    });
+                }
+            }
 
-            return result;
-            */
-        }
-
-
-        private List<FileDto> GetFilesRecursivelyFromPattern(string path, string filePattern, string pathPattern)
-        {
-            CheckDirectoryPath(path);
-
-            var result = new List<FileDto>();
-
-            //Regex reg = new(@".*net6.0.*");
-            Regex reg = new(pathPattern);
-
-            var files = Directory.GetFiles(path, filePattern, SearchOption.AllDirectories)
-                                 .Where(path => reg.IsMatch(path))
-                                 .ToList();
-
-            files.ForEach(f =>
-            {
-                FileInfo fi = new(f);
-            
-                result.Add(new FileDto()
-                {
-                    Id = result.Count,
-                    Name = fi.Name,
-                    LastWriteTime = fi.LastWriteTime.ToString("MM/dd/yyyy HH:mm:ss"),
-                    Length = fi.Length,
-                    FullPath = fi.FullName,
-                    PartialPath = fi.DirectoryName?.Replace(path, "")
-                });
-
-            });
 
             return result;
         }
-    }
-}
+
+    } // end class
+} // end namespace
